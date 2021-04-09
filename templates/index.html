@@ -116,7 +116,9 @@
            <span class="input-group-text" style="width: 90px">Example</span>
            <select class="form-control" name="chr_example" id="chr_example" onchange="exampleChr()">
                <option value="" selected disabled hidden>Choose here</option>
-               <option>Neural Machine Translation</option>
+               {% for i in range(5) %}
+                  <option value={{chrs_id[i]}}>{{chrs[i]}}</option>
+               {% endfor %}
            </select>
         </div>
         <div class="input-group" id="chr_box">
@@ -172,7 +174,9 @@
            <span class="input-group-text" style="width: 90px">Example</span>
            <select class="form-control" name="en_example" id="en_example" onchange="exampleEn()">
                <option value="" selected disabled hidden>Choose here</option>
-               <option>Neural Machine Translation</option>
+               {% for i in range(5) %}
+                  <option value={{ens_id[i]}}>{{ens[i]}}</option>
+               {% endfor %}
            </select>
         </div>
         <div class="input-group" id="en_box">
@@ -354,11 +358,13 @@
 
     function exampleChr() {
         console.log(document.getElementById("chr_example").value);
-        document.getElementById("chr").value = document.getElementById("chr_example").value;
+        var chr_e = document.getElementById("chr_example");
+        document.getElementById("chr").value = chr_e.options[chr_e.selectedIndex].text;
     }
     function exampleEn() {
         console.log(document.getElementById("en_example").value);
-        document.getElementById("en").value = document.getElementById("en_example").value;
+        var en_e = document.getElementById("en_example");
+        document.getElementById("en").value = en_e.options[en_e.selectedIndex].text;
     }
 
     // var feedback_chr = document.getElementById("feedback_chr");

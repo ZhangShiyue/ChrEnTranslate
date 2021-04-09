@@ -309,6 +309,17 @@ def look_up_dictionary(en_tokens, chr_tokens):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # get examples
+    chrs, chrs_id = [], []
+    cursors = mongo.db.chr.find({"status": "unlabeled"}).limit(5)
+    for cursor in cursors:
+        chrs.append(cursor["text"])
+        chrs_id.append(cursor["uid"])
+    ens, ens_id = [], []
+    cursors = mongo.db.en.find({"status": "unlabeled"}).limit(5)
+    for cursor in cursors:
+        ens.append(cursor["text"])
+        ens_id.append(cursor["uid"])
     en, chr, nmt, tochr, toen = "", "", True, False, False
     en_qe, chr_qe = 0.0, 0.0
     align, word_alignment, width, height = False, [], 0, 0
@@ -350,7 +361,8 @@ def index():
     return render_template('index.html', en=en, chr=chr, tochr=tochr, toen=toen,
                            nmt=nmt, en_qe=en_qe, chr_qe=chr_qe,
                            align=align, word_alignment=word_alignment, width=width, height=height,
-                           dictionary=dictionary, table=table, table_height=table_height)
+                           dictionary=dictionary, table=table, table_height=table_height,
+                           chrs=chrs, chrs_id=chrs_id, ens=ens, ens_id=ens_id)
 
 
 @app.route('/expert', methods=['GET', 'POST'])
