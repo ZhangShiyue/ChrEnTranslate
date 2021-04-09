@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.80.0">
+    <title>Cherokee English Machine Translation</title>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-heatmap.min.js"></script>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/checkout/">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/static/style.css">
+
+      <style>
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      .rate {
+            float: left;
+            height: 20px;
+            /*padding: 0 0px;*/
+        }
+        .rate:not(:checked) > input {
+            position:absolute;
+            top:-9999px;
+            visibility: hidden;
+        }
+        .rate:not(:checked) > label {
+            float:right;
+            width:1em;
+            overflow:hidden;
+            white-space:nowrap;
+            cursor:pointer;
+            font-size:18px;
+            color:#ccc;
+        }
+        .rate:not(:checked) > label:before {
+            content: '★ ';
+        }
+        .rate > input:checked ~ label {
+            color: #ffc700;
+        }
+        .rate:not(:checked) > label:hover,
+        .rate:not(:checked) > label:hover ~ label {
+            color: #deb217;
+        }
+        .rate > input:checked + label:hover,
+        .rate > input:checked + label:hover ~ label,
+        .rate > input:checked ~ label:hover,
+        .rate > input:checked ~ label:hover ~ label,
+        .rate > label:hover ~ input:checked ~ label {
+            color: #c59b08;
+        }
+    </style>
+
+    
+  </head>
+  <body class="bg-light">
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+              <img src="/static/icon.png" width="35" height="43" class="d-inline-block align-top" alt="">
+            </a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent2">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#">Demo</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+<div class="container">
+  <main>
+    <div class="py-5 text-center">
+        <p style="color:#FF0000";>This page is for expert usage only. </p> <br><br>
+      <img src="/static/icon.png" width="120" height="140" class="d-inline-block align-top" alt="">
+    </div>
+    <div class="text-center">
+     <h3>Cherokee-English Translate</h3>
+      </div>
+  <form action="/expert" method="POST" id="translate" class="needs-validation" novalidate>
+     <div class="py-5 input-group">
+       <span class="input-group-text" style="width: 90px">Model</span>
+       <select class="form-select" required id="model" name="model">
+           {% if nmt %}
+             <option selected value="nmt">Neural Machine Translation</option>
+           {% else %}
+             <option selected value="smt">Statistical Machine Translation</option>
+           {% endif %}
+         <option value="nmt">Neural Machine Translation</option>
+         <option value="smt">Statistical Machine Translation</option>
+       </select>
+     </div>
+      <div class="form-group" >
+        <div class="input-group" id="chr_box">
+           <span class="input-group-text" style="width: 90px">Cherokee</span>
+           <textarea class="form-control" aria-label="With textarea" rows="3" name="chr" id="chr" required>{{chr}}</textarea>
+        </div>
+          <i style="font-size: 14px; margin-left: 90px;">Translation Quality Estimation:</i>
+          <div class="Stars" style="--rating: {{chr_qe}};"></div>
+          {% if tochr %}
+          <div class="accordion" id="accordionExample0" style=" float: right;">
+            <button class="btn btn-link collapsed" style="font-size: 14px;" type="button" data-toggle="collapse" data-target="#collapseThree0" aria-expanded="false" aria-controls="collapseThree">
+              User Feedback
+            </button>
+          </div>
+            <div id="collapseThree0" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample0">
+               <div class="card-body" style="background-color: aliceblue;">
+                   <div class="rate" id="rate_chr">
+                       <span>How good do you think the translation is? (1-5)&nbsp;&nbsp;</span>
+                    <input class="form-control" type="radio" id="star50" name="rate_chr" value="5" required />
+                    <label for="star50" title="text">5 stars</label>
+                    <input class="form-control" type="radio" id="star40" name="rate_chr" value="4" required />
+                    <label for="star40" title="text">4 stars</label>
+                    <input class="form-control" type="radio" id="star30" name="rate_chr" value="3" required />
+                    <label for="star30" title="text">3 stars</label>
+                    <input class="form-control" type="radio" id="star20" name="rate_chr" value="2" required />
+                    <label for="star20" title="text">2 stars</label>
+                    <input class="form-control" type="radio" id="star10" name="rate_chr" value="1" required />
+                    <label for="star10" title="text">1 star</label>
+                    <div class="invalid-feedback">Please provide your rating.</div>
+                   </div>
+                   <br><br>Please <strong>correct the translation</strong> in the following box:
+                  <div class="form-group" id="feedback_chr_box">
+                      <div class="input-group">
+                          <span class="input-group-text" style="width: 90px">Cherokee </span>
+                          <textarea class="form-control" aria-label="With textarea" rows="3" name="feedback_chr" id="feedback_chr_text" required>{{chr}}</textarea>
+                      </div>
+                  </div>
+                   Please provide your <strong>open-ended comments</strong> in the following box (<i>optional</i>):
+                  <div class="form-group" id="feedback_chr_open_box">
+                      <div class="input-group">
+                          <span class="input-group-text" style="width: 90px">Comment </span>
+                          <textarea class="form-control" aria-label="With textarea" rows="3" name="feedback_chr_open" id="feedback_chr_open_text"></textarea>
+                      </div>
+                  </div>
+                   <div class="py-2 bd-example">
+                        <button type="button" class="btn btn-primary" name="feedback" value="tochr" onclick="return feedbackChr()">Submit</button>
+                   </div>
+                </div>
+            </div>
+           {% endif %}
+      </div>
+    <div class="bd-example">
+      <button type="submit" class="btn btn-primary me-2" name="action" value="toen" form="translate" onclick="return submitForm(this)">To English</button>
+      <button type="submit" class="btn btn-primary" name="action" value="tochr" form="translate" onclick="return submitForm(this)">To Cherokee</button>
+    </div>
+    <div class="py-3 form-group" >
+        <div class="input-group" id="en_box">
+          <span class="input-group-text" style="width: 90px">English </span>
+          <textarea class="form-control" aria-label="With textarea" rows="3" name="en" id="en" required>{{en}}</textarea>
+        </div>
+      <i style="font-size: 14px; margin-left: 90px;">Translation Quality Estimation:</i>
+      <div class="Stars" style="--rating: {{en_qe}}; width: 100px"></div>
+        {% if toen %}
+        <div class="accordion" id="accordionExample1" style=" float: right;">
+            <button class="btn btn-link collapsed" style="font-size: 14px;" type="button" data-toggle="collapse" data-target="#collapseThree1" aria-expanded="false" aria-controls="collapseThree">
+              User Feedback
+            </button>
+        </div>
+        <div id="collapseThree1" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample1">
+           <div class="card-body" style="background-color: aliceblue;">
+               <div class="rate" id="rate_en">
+                   <span>How good do you think the translation is? (1-5)&nbsp;&nbsp;</span>
+                <input class="form-control" type="radio" id="star51" name="rate_en" value="5" required />
+                <label for="star51" title="text">5 stars</label>
+                <input class="form-control" type="radio" id="star41" name="rate_en" value="4" required />
+                <label for="star41" title="text">4 stars</label>
+                <input class="form-control" type="radio" id="star31" name="rate_en" value="3" required />
+                <label for="star31" title="text">3 stars</label>
+                <input class="form-control" type="radio" id="star21" name="rate_en" value="2" required />
+                <label for="star21" title="text">2 stars</label>
+                <input class="form-control" type="radio" id="star11" name="rate_en" value="1" required />
+                <label for="star11" title="text">1 star</label>
+                <div class="invalid-feedback">Please provide your rating.</div>
+               </div>
+               <br><br>Please <strong>correct the translation</strong> in the following box:
+              <div class="form-group" id="feedback_en_box">
+                  <div class="input-group">
+                    <span class="input-group-text" style="width: 90px">English </span>
+                    <textarea class="form-control" aria-label="With textarea" rows="3" name="feedback_en" id="feedback_en_text" required>{{en}}</textarea>
+                  </div>
+              </div>
+               Please provide your <strong>open-ended comments</strong> in the following box (<i>optional</i>):
+              <div class="form-group" id="feedback_en_open_box">
+                  <div class="input-group">
+                    <span class="input-group-text" style="width: 90px">Comment </span>
+                    <textarea class="form-control" aria-label="With textarea" rows="3" name="feedback_en_open" id="feedback_en_open_text"></textarea>
+                  </div>
+              </div>
+               <div class="py-2 bd-example">
+                    <button type="button" class="btn btn-primary" name="feedback" value="toen" onclick="return feedbackEn()">Submit</button>
+               </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+  </form>
+      {% if align %}
+        <hr>
+         <p class="h5">Word Alignment Learned by the Translation Model</p>
+         <div class="py-3" style="width:{{'%spx'|format(width)}}; height: {{'%spx'|format(height)}}; margin: 0; padding: 0; overflow-y: auto; overflow-x: auto" id="container"></div>
+      {% endif %}
+      {% if dictionary %}
+          <br><hr>
+          <p class="h5">Relevant Terms from Cherokee-English Dictionary</p>
+          <i style="font-size: 14px;">*The following terms are not complete. See complete information on <a href="https://www.cherokeedictionary.net/#">Cherokee-English Dictionary</a>.</i>
+          <div class="py-3" style="height: {{'%spx'|format(table_height)}}; overflow-y: auto">
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th scope="col" style="width: 300px">Cherokee Syllabary/Phonetic</th>
+                <th scope="col" style="width: 200px">English</th>
+                <th scope="col">Sentence</th>
+              </tr>
+              </thead>
+                {{table|safe}}
+            </table>
+            </div>
+      {% endif %}
+
+  </main>
+
+  <footer class="my-5 pt-5 text-muted text-center text-small">
+    <p class="mb-1">&copy; 2021 Shiyue Zhang</p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="#">Privacy</a></li>
+      <li class="list-inline-item"><a href="#">Terms</a></li>
+      <li class="list-inline-item"><a href="#">Support</a></li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+      anychart.onDocumentReady(function () {
+
+        var data_tmp = {{ word_alignment|safe }};
+        var data = [];
+        for (let i = 0; i < data_tmp.length; i++) {
+            data.push({ x: data_tmp[i][0], y: data_tmp[i][1], heat: data_tmp[i][2]})
+        }
+
+        // create the chart and set the data
+        chart = anychart.heatMap(data);
+        var xlabels = chart.xAxis().labels();
+        xlabels.fontSize(12);
+        xlabels.rotation(270);
+        var ylabels = chart.yAxis().labels();
+        ylabels.fontSize(12);
+
+        // annotation.adjustFontSize(true);
+
+        // set the chart title
+        // chart.title("Word alignment learned by the translation model");
+        chart.tooltip().format("{\%y}: {\%heat}");
+
+        // create and configure the color scale.
+        var customColorScale = anychart.scales.linearColor();
+        customColorScale.colors(["#ACE8D4", "#00726A"]);
+
+        // set the color scale as the color scale of the chart
+        chart.colorScale(customColorScale);
+
+        // set the container id
+        chart.container("container");
+
+        // initiate drawing the chart
+        chart.draw();
+
+      });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script type="text/javascript">
+    // var translate_form = document.getElementById("translate");
+    var en_box = document.getElementById("en_box");
+    var en = document.getElementById("en");
+    var chr_box = document.getElementById("chr_box");
+    var chr = document.getElementById("chr");
+    function submitForm (button) {
+        if ((button.value === "tochr") && (en.value === "")) {
+            en_box.classList.add('was-validated');
+            return false;
+        } else if ((button.value === "toen") && (chr.value === "")) {
+            chr_box.classList.add('was-validated');
+            return false;
+        }
+    }
+
+    // var feedback_chr = document.getElementById("feedback_chr");
+    // $(document).on('submit','#feedback_chr',function(e) {
+    function feedbackChr() {
+      var feedback_chr = document.getElementById("feedback_chr_text");
+      var feedback_chr_box = document.getElementById("feedback_chr_box");
+      var radios = document.getElementsByName("rate_chr");
+      var radios_box = document.getElementById("rate_chr");
+      if (feedback_chr.value === "") {
+          feedback_chr_box.classList.add('was-validated');
+          return false;
+      }
+      var formValid = false;
+      var i = 0;
+      while (!formValid && i < radios.length) {
+        if (radios[i].checked) formValid = true;
+        i++;
+      }
+      if (!formValid){
+          radios_box.classList.add('was-validated');
+          return false;
+      }
+      console.log("here");
+      $.ajax({
+        type:'POST',
+        url:'/expertfeedback',
+        data:{
+          rate: document.querySelector('input[name="rate_chr"]:checked').value,
+          type: "tochr",
+          text: document.querySelector('textarea[name="feedback_chr"]').value,
+          chr: document.querySelector('textarea[name="chr"]').value,
+          en: document.querySelector('textarea[name="en"]').value,
+          model: document.querySelector('select[name="model"]').value,
+          comment: document.querySelector('textarea[name="feedback_chr_open"]').value,
+          qe: {{chr_qe | safe}},
+        },
+        success:function()
+        {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thanks for your feedback!',
+                showConfirmButton: false,
+                timer: 1500}
+            )
+        }
+      })
+    }//);
+
+    function feedbackEn (){
+      var feedback_en = document.getElementById("feedback_en_text");
+      var feedback_en_box = document.getElementById("feedback_en_box");
+      var radios = document.getElementsByName("rate_en");
+      var radios_box = document.getElementById("rate_en");
+      if (feedback_en.value === "") {
+          feedback_en_box.classList.add('was-validated');
+          return false;
+      }
+      var formValid = false;
+      var i = 0;
+      while (!formValid && i < radios.length) {
+        if (radios[i].checked) formValid = true;
+        i++;
+      }
+      if (!formValid){
+          radios_box.classList.add('was-validated');
+          return false;
+      }
+      $.ajax({
+        type:'POST',
+        url:'/expertfeedback',
+        data:{
+          rate: document.querySelector('input[name="rate_en"]:checked').value,
+          type: "toen",
+          text: document.querySelector('textarea[name="feedback_en"]').value,
+          chr: document.querySelector('textarea[name="chr"]').value,
+          en: document.querySelector('textarea[name="en"]').value,
+          model: document.querySelector('select[name="model"]').value,
+          comment: document.querySelector('textarea[name="feedback_en_open"]').value,
+          qe: {{en_qe | safe}},
+        },
+        success:function()
+        {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thanks for your feedback!',
+                showConfirmButton: false,
+                timer: 1500}
+            )
+        }
+      })
+    } //);
+  </script>
+  </body>
+</html>
