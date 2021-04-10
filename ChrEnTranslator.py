@@ -383,48 +383,26 @@ def index():
 
 @app.route('/expert', methods=['GET', 'POST'])
 def expert():
+    # get examples
+    chrs, chrs_id = [], []
+    cursors = mongo.db.chr.find({"status": "unlabeled"}).limit(5)
+    for cursor in cursors:
+        chrs.append(cursor["text"])
+        chrs_id.append(cursor["uid"])
+    ens, ens_id = [], []
+    cursors = mongo.db.en.find({"status": "unlabeled"}).limit(5)
+    for cursor in cursors:
+        ens.append(cursor["text"])
+        ens_id.append(cursor["uid"])
     en, chr, nmt, tochr, toen = "", "", True, False, False
     en_qe, chr_qe = 0.0, 0.0
     align, word_alignment, width, height = False, [], 0, 0
     dictionary, table, table_height = False, "", 0
-    if request.method == "POST":
-        if request.form["model"] == "nmt":
-            nmt = True
-            if request.form["action"] == "tochr":
-                tochr, toen = True, False
-                en = request.form["en"]
-                if en.strip() != '':
-                    chr, chr_qe, word_alignment, width, height, table, table_height = enchr_translate(en)
-                    align, dictionary = True, True if table_height > 0 else False
-            elif request.form["action"] == "toen":
-                toen, tochr = True, False
-                chr = request.form["chr"]
-                if chr.strip() != '':
-                    en, en_qe, word_alignment, width, height, table, table_height = chren_translate(chr)
-                    align, dictionary = True, True if table_height > 0 else False
-        elif request.form["model"] == "smt":
-            nmt = False
-            if request.form["action"] == "tochr":
-                tochr, toen = True, False
-                en = request.form["en"]
-                if en.strip() != '':
-                    chr, chr_qe, word_alignment, width, height, table, table_height = smt_enchr_translate(en)
-                    align, dictionary = True, True if table_height > 0 else False
-            elif request.form["action"] == "toen":
-                toen, tochr = True, False
-                chr = request.form["chr"]
-                if chr.strip() != '':
-                    en, en_qe, word_alignment, width, height, table, table_height = smt_chren_translate(chr)
-                    align, dictionary = True, True if table_height > 0 else False
-    if width > 0:
-        width = min(width, 450) + 100
-        height = min(height, 450) + 150
-    if table_height > 0:
-        table_height = min(table_height, 400)
     return render_template('expert.html', en=en, chr=chr, tochr=tochr, toen=toen,
                            nmt=nmt, en_qe=en_qe, chr_qe=chr_qe,
                            align=align, word_alignment=word_alignment, width=width, height=height,
-                           dictionary=dictionary, table=table, table_height=table_height)
+                           dictionary=dictionary, table=table, table_height=table_height,
+                           chrs=chrs, chrs_id=chrs_id, ens=ens, ens_id=ens_id)
 
 
 @app.route('/expertfeedback', methods=['GET', 'POST'])
@@ -441,7 +419,17 @@ def expertfeedback():
         mongo.db.expert.insert_one({"type": type, "model": model, "en": en, "chr": chr, "qe": qe,
                                     "rate": rate, "text": text, "timestamp": time.time(),
                                     "comment": comment})
-    return render_template('expert.html')
+        if type == "toen":
+            chr_example = request.form.get("chr_example")
+            chr_example_id = request.form.get("chr_example_id")
+            if chr_example_id and chr_example == chr:
+                mongo.db.chr.update_one({"uid": chr_example_id}, {"$set": {"status": "labeled"}})
+        elif type == "tochr":
+            en_example = request.form.get("en_example")
+            en_example_id = request.form.get("en_example_id")
+            if en_example_id and en_example == en:
+                mongo.db.en.update_one({"uid": en_example_id}, {"$set": {"status": "labeled"}})
+    return {}
 
 
 @app.route('/feedback', methods=['GET', 'POST'])

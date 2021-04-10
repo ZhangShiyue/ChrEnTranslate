@@ -59,6 +59,9 @@
         .rate > label:hover ~ input:checked ~ label {
             color: #c59b08;
         }
+    #popbox{position:absolute;width:600px; height:400px; left:45%; top:50%; margin:-200px 0 0 -200px; display:none; background:#ffffff;}
+    #supbox{position:absolute;width:400px; height:200px; left:50%; top:50%; margin:-200px 0 0 -200px; display:none; background:#ffffff;}
+    #bg{width:100%;height:100%;top:0px;left:0px;position:absolute;filter: Alpha(opacity=50);opacity:0.5; background:#000000; display:none;}
     </style>
 
     
@@ -89,27 +92,32 @@
     <div class="text-center">
      <h3>Cherokee-English Translate</h3>
       </div>
-  <form action="/expert" method="POST" id="translate" class="needs-validation" novalidate>
+  <form id="translate" class="needs-validation" novalidate>
      <div class="py-5 input-group">
        <span class="input-group-text" style="width: 90px">Model</span>
        <select class="form-select" required id="model" name="model">
-           {% if nmt %}
-             <option selected value="nmt">Neural Machine Translation</option>
-           {% else %}
-             <option selected value="smt">Statistical Machine Translation</option>
-           {% endif %}
-         <option value="nmt">Neural Machine Translation</option>
+         <option selected value="nmt">Neural Machine Translation</option>
          <option value="smt">Statistical Machine Translation</option>
        </select>
      </div>
       <div class="form-group" >
+        <div class="input-group" id="chr_example_box">
+           <span class="input-group-text" style="width: 90px">Example</span>
+           <select class="form-control" name="chr_example" id="chr_example" onchange="exampleChr()">
+               <option value="" selected disabled hidden>Choose here</option>
+               {% for i in range(5) %}
+                  <option value={{chrs_id[i]}}>{{chrs[i]}}</option>
+               {% endfor %}
+           </select>
+        </div>
         <div class="input-group" id="chr_box">
            <span class="input-group-text" style="width: 90px">Cherokee</span>
-           <textarea class="form-control" aria-label="With textarea" rows="3" name="chr" id="chr" required>{{chr}}</textarea>
+           <textarea class="form-control" aria-label="With textarea" rows="3" name="chr"
+                     placeholder="Input any Cherokee text or choose an example input from above" id="chr" required></textarea>
         </div>
+        <div id="chr_qe_feedback" style="display: none">
           <i style="font-size: 14px; margin-left: 90px;">Translation Quality Estimation:</i>
-          <div class="Stars" style="--rating: {{chr_qe}};"></div>
-          {% if tochr %}
+          <div id="chr_qe" class="Stars" style="--rating: 0;"></div>
           <div class="accordion" id="accordionExample0" style=" float: right;">
             <button class="btn btn-link collapsed" style="font-size: 14px;" type="button" data-toggle="collapse" data-target="#collapseThree0" aria-expanded="false" aria-controls="collapseThree">
               User Feedback
@@ -135,7 +143,7 @@
                   <div class="form-group" id="feedback_chr_box">
                       <div class="input-group">
                           <span class="input-group-text" style="width: 90px">Cherokee </span>
-                          <textarea class="form-control" aria-label="With textarea" rows="3" name="feedback_chr" id="feedback_chr_text" required>{{chr}}</textarea>
+                          <textarea class="form-control" aria-label="With textarea" rows="3" name="feedback_chr" id="feedback_chr_text" required></textarea>
                       </div>
                   </div>
                    Please provide your <strong>open-ended comments</strong> in the following box (<i>optional</i>):
@@ -150,20 +158,30 @@
                    </div>
                 </div>
             </div>
-           {% endif %}
+        </div>
       </div>
     <div class="bd-example">
-      <button type="submit" class="btn btn-primary me-2" name="action" value="toen" form="translate" onclick="return submitForm(this)">To English</button>
-      <button type="submit" class="btn btn-primary" name="action" value="tochr" form="translate" onclick="return submitForm(this)">To Cherokee</button>
+      <button type="button" class="btn btn-primary me-3" name="action" value="toen" form="translate" onclick="return submitToEn(this)">To English</button>
+      <button type="button" class="btn btn-primary" name="action" value="tochr" form="translate" onclick="return submitToChr(this)">To Cherokee</button>
     </div>
     <div class="py-3 form-group" >
+        <div class="input-group" id="en_example_box">
+           <span class="input-group-text" style="width: 90px">Example</span>
+           <select class="form-control" name="en_example" id="en_example" onchange="exampleEn()">
+               <option value="" selected disabled hidden>Choose here</option>
+               {% for i in range(5) %}
+                  <option value={{ens_id[i]}}>{{ens[i]}}</option>
+               {% endfor %}
+           </select>
+        </div>
         <div class="input-group" id="en_box">
           <span class="input-group-text" style="width: 90px">English </span>
-          <textarea class="form-control" aria-label="With textarea" rows="3" name="en" id="en" required>{{en}}</textarea>
+          <textarea class="form-control" aria-label="With textarea" rows="3" name="en"
+                    placeholder="Input any English text or choose an example input from above" id="en" required></textarea>
         </div>
+    <div id="en_qe_feedback" style="display: none">
       <i style="font-size: 14px; margin-left: 90px;">Translation Quality Estimation:</i>
-      <div class="Stars" style="--rating: {{en_qe}}; width: 100px"></div>
-        {% if toen %}
+      <div id="en_qe" class="Stars" style="--rating: 0; width: 100px"></div>
         <div class="accordion" id="accordionExample1" style=" float: right;">
             <button class="btn btn-link collapsed" style="font-size: 14px;" type="button" data-toggle="collapse" data-target="#collapseThree1" aria-expanded="false" aria-controls="collapseThree">
               User Feedback
@@ -189,7 +207,7 @@
               <div class="form-group" id="feedback_en_box">
                   <div class="input-group">
                     <span class="input-group-text" style="width: 90px">English </span>
-                    <textarea class="form-control" aria-label="With textarea" rows="3" name="feedback_en" id="feedback_en_text" required>{{en}}</textarea>
+                    <textarea class="form-control" aria-label="With textarea" rows="3" name="feedback_en" id="feedback_en_text" required></textarea>
                   </div>
               </div>
                Please provide your <strong>open-ended comments</strong> in the following box (<i>optional</i>):
@@ -204,49 +222,158 @@
                </div>
             </div>
         </div>
-        {% endif %}
+    </div>
 
     </div>
   </form>
-      {% if align %}
+      <div id="align" style="display: none">
         <hr>
          <p class="h5">Word Alignment Learned by the Translation Model</p>
-         <div class="py-3" style="width:{{'%spx'|format(width)}}; height: {{'%spx'|format(height)}}; margin: 0; padding: 0; overflow-y: auto; overflow-x: auto" id="container"></div>
-      {% endif %}
-      {% if dictionary %}
+         <div class="py-3" style="width:0px; height: 0px; margin: 0; padding: 0; overflow-y: auto; overflow-x: auto" id="container"></div>
+      </div>
+      <div id="dictionary" style="display: none">
           <br><hr>
           <p class="h5">Relevant Terms from Cherokee-English Dictionary</p>
           <i style="font-size: 14px;">*The following terms are not complete. See complete information on <a href="https://www.cherokeedictionary.net/#">Cherokee-English Dictionary</a>.</i>
-          <div class="py-3" style="height: {{'%spx'|format(table_height)}}; overflow-y: auto">
-            <table class="table table-striped">
-              <thead>
-              <tr>
-                <th scope="col" style="width: 300px">Cherokee Syllabary/Phonetic</th>
-                <th scope="col" style="width: 200px">English</th>
-                <th scope="col">Sentence</th>
-              </tr>
-              </thead>
-                {{table|safe}}
-            </table>
-            </div>
-      {% endif %}
-
+          <div id="dictionary_table" class="py-3" style="height: 0px; overflow-y: auto">
+          </div>
+      </div>
+  <div id="bg"></div>
+  <div id="popbox" class="card mb-4 shadow-sm">
+      <div class="card-header text-center">
+        <h4 class="my-0 font-weight-normal">Terms</h4>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled mt-1 mb-3">
+          <li>[1] Whenever you use our Site, you agree to be aware that the translations provided by our Site are translated by
+              machines, are highly likely to be poor-quality, and are not supposed to be used at anywhere else without
+              confirmation from professional Cherokee-English translators. </li>
+        </ul>
+        <button type="button" class="btn btn-primary" onclick="pupclose()">Accept</button>
+      </div>
+  </div>
+  <div id="supbox" class="card mb-4 shadow-sm">
+      <div class="card-header text-center">
+        <h4 class="my-0 font-weight-normal">Support</h4>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled mt-1 mb-3">
+          <li> Need help? Please email Shiyue Zhang (shiyue At cs.unc.edu).</li>
+        </ul>
+        <button type="button" class="btn btn-primary" onclick="supclose()">Got it</button>
+      </div>
+  </div>
   </main>
 
   <footer class="my-5 pt-5 text-muted text-center text-small">
     <p class="mb-1">&copy; 2021 Shiyue Zhang</p>
     <ul class="list-inline">
-      <li class="list-inline-item"><a href="#">Privacy</a></li>
-      <li class="list-inline-item"><a href="#">Terms</a></li>
-      <li class="list-inline-item"><a href="#">Support</a></li>
+      <li class="list-inline-item"><a href="#" onclick="pupopen()">Terms</a></li>
+      <li class="list-inline-item"><a href="#" onclick="supopen()">Support</a></li>
     </ul>
   </footer>
 </div>
 
-<script>
-      anychart.onDocumentReady(function () {
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script type="text/javascript">
+    function pupopen(){
+        document.getElementById("bg").style.display="block";
+        document.getElementById("popbox").style.display="block" ;
+    }
+    function pupclose(){
+        document.getElementById("bg").style.display="none";
+        document.getElementById("popbox").style.display="none" ;
+    }
+    function supopen(){
+        document.getElementById("bg").style.display="block";
+        document.getElementById("supbox").style.display="block" ;
+    }
+    function supclose(){
+        document.getElementById("bg").style.display="none";
+        document.getElementById("supbox").style.display="none" ;
+    }
+    var en_box = document.getElementById("en_box");
+    var en = document.getElementById("en");
+    var chr_box = document.getElementById("chr_box");
+    var chr = document.getElementById("chr");
+    function submitToEn (button) {
+        if (chr.value === "") {
+            chr_box.classList.add('was-validated');
+            return false;
+        }
+        $.ajax({
+        type:'POST',
+        url:'/toen',
+        data:{
+            chr: chr.value,
+            model: document.querySelector('select[name="model"]').value,
+        }}).done(function (data) {
+            en.value = data.en;
+            document.getElementById("en_qe").style.setProperty("--rating", data.en_qe);
+            document.getElementById("chr_qe_feedback").style.setProperty("display", "none");
+            document.getElementById("en_qe_feedback").style.setProperty("display", "block");
+            document.getElementById("collapseThree0").setAttribute("class", "collapse");
+            document.getElementById('en_example').value= "";
+            document.getElementById("feedback_en_text").value = data.en;
+            var i = 0;
+            var radios = document.getElementsByName("rate_en");
+            while (i < radios.length) {
+                radios[i].checked = false;
+                i++;
+            }
+            document.getElementById('feedback_en_open_text').value= "";
+            console.log( document.getElementById('feedback_en_open_text').value);
+            document.getElementById("align").style.setProperty("display", "block");
+            document.getElementById("container").style.setProperty("width", data.width + "px");
+            document.getElementById("container").style.setProperty("height", data.height + "px");
+            document.getElementById("container").innerHTML = "";
+            drawAlign(data.word_alignment);
+            document.getElementById("dictionary").style.setProperty("display", "block");
+            document.getElementById("dictionary_table").style.setProperty("height", data.table_height + "px");
+            document.getElementById("dictionary_table").innerHTML = data.table;
+        })
+    }
+    function submitToChr(button) {
+        if (en.value === "") {
+            en_box.classList.add('was-validated');
+            return false;
+        }
+        $.ajax({
+        type:'POST',
+        url:'/tochr',
+        data:{
+            en: document.querySelector('textarea[name="en"]').value,
+            model: document.querySelector('select[name="model"]').value,
+        }}).done(function (data) {
+            chr.value = data.chr;
+            document.getElementById("chr_qe").style.setProperty("--rating", data.chr_qe);
+            document.getElementById("chr_qe_feedback").style.setProperty("display", "block");
+            document.getElementById("en_qe_feedback").style.setProperty("display", "none");
+            document.getElementById("collapseThree1").setAttribute("class", "collapse");
+            document.getElementById('chr_example').value= "";
+            document.getElementById("feedback_chr_text").value = data.chr;
+            var i = 0;
+            var radios = document.getElementsByName("rate_chr");
+            while (i < radios.length) {
+                radios[i].checked = false;
+                i++;
+            }
+            document.getElementById('feedback_chr_open_text').value= "";
+            document.getElementById("align").style.setProperty("display", "block");
+            document.getElementById("container").style.setProperty("width", data.width + "px");
+            document.getElementById("container").style.setProperty("height", data.height + "px");
+            document.getElementById("container").innerHTML = "";
+            drawAlign(data.word_alignment);
+            document.getElementById("dictionary").style.setProperty("display", "block");
+            document.getElementById("dictionary_table").style.setProperty("height", data.table_height + "px");
+            document.getElementById("dictionary_table").innerHTML = data.table;
+        })
+    }
 
-        var data_tmp = {{ word_alignment|safe }};
+    function drawAlign(word_alignment) {
+
+        var data_tmp = word_alignment;
         var data = [];
         for (let i = 0; i < data_tmp.length; i++) {
             data.push({ x: data_tmp[i][0], y: data_tmp[i][1], heat: data_tmp[i][2]})
@@ -275,32 +402,20 @@
 
         // set the container id
         chart.container("container");
-
         // initiate drawing the chart
         chart.draw();
 
-      });
-    </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script type="text/javascript">
-    // var translate_form = document.getElementById("translate");
-    var en_box = document.getElementById("en_box");
-    var en = document.getElementById("en");
-    var chr_box = document.getElementById("chr_box");
-    var chr = document.getElementById("chr");
-    function submitForm (button) {
-        if ((button.value === "tochr") && (en.value === "")) {
-            en_box.classList.add('was-validated');
-            return false;
-        } else if ((button.value === "toen") && (chr.value === "")) {
-            chr_box.classList.add('was-validated');
-            return false;
-        }
+      }
+
+    function exampleChr() {
+        var chr_e = document.getElementById("chr_example");
+        document.getElementById("chr").value = chr_e.options[chr_e.selectedIndex].text;
+    }
+    function exampleEn() {
+        var en_e = document.getElementById("en_example");
+        document.getElementById("en").value = en_e.options[en_e.selectedIndex].text;
     }
 
-    // var feedback_chr = document.getElementById("feedback_chr");
-    // $(document).on('submit','#feedback_chr',function(e) {
     function feedbackChr() {
       var feedback_chr = document.getElementById("feedback_chr_text");
       var feedback_chr_box = document.getElementById("feedback_chr_box");
@@ -320,7 +435,7 @@
           radios_box.classList.add('was-validated');
           return false;
       }
-      console.log("here");
+      var en_e = document.getElementById("en_example");
       $.ajax({
         type:'POST',
         url:'/expertfeedback',
@@ -330,9 +445,11 @@
           text: document.querySelector('textarea[name="feedback_chr"]').value,
           chr: document.querySelector('textarea[name="chr"]').value,
           en: document.querySelector('textarea[name="en"]').value,
+          en_example_id: en_e.value,
+          en_example: en_e.options[en_e.selectedIndex].text,
           model: document.querySelector('select[name="model"]').value,
           comment: document.querySelector('textarea[name="feedback_chr_open"]').value,
-          qe: {{chr_qe | safe}},
+          qe: document.getElementById("chr_qe").style.getPropertyValue("--rating"),
         },
         success:function()
         {
@@ -365,6 +482,7 @@
           radios_box.classList.add('was-validated');
           return false;
       }
+      var chr_e = document.getElementById("chr_example");
       $.ajax({
         type:'POST',
         url:'/expertfeedback',
@@ -374,9 +492,11 @@
           text: document.querySelector('textarea[name="feedback_en"]').value,
           chr: document.querySelector('textarea[name="chr"]').value,
           en: document.querySelector('textarea[name="en"]').value,
+          chr_example_id: chr_e.value,
+          chr_example: chr_e.options[chr_e.selectedIndex].text,
           model: document.querySelector('select[name="model"]').value,
           comment: document.querySelector('textarea[name="feedback_en_open"]').value,
-          qe: {{en_qe | safe}},
+          qe: document.getElementById("en_qe").style.getPropertyValue("--rating"),
         },
         success:function()
         {

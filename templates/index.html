@@ -59,15 +59,15 @@
         .rate > label:hover ~ input:checked ~ label {
             color: #c59b08;
         }
-      {% if (tochr or toen) %}
-    #popbox{position:absolute;width:600px; height:400px; left:45%; top:50%; margin:-200px 0 0 -200px; display:none; background:#ffffff;}
-    #supbox{position:absolute;width:400px; height:200px; left:50%; top:50%; margin:-200px 0 0 -200px; display:none; background:#ffffff;}
-    #bg{width:100%;height:100%;top:0px;left:0px;position:absolute;filter: Alpha(opacity=50);opacity:0.5; background:#000000; display:none;}
-      {% else %}
+    /*  {% if (tochr or toen) %}*/
+    /*#popbox{position:absolute;width:600px; height:400px; left:45%; top:50%; margin:-200px 0 0 -200px; display:none; background:#ffffff;}*/
+    /*#supbox{position:absolute;width:400px; height:200px; left:50%; top:50%; margin:-200px 0 0 -200px; display:none; background:#ffffff;}*/
+    /*#bg{width:100%;height:100%;top:0px;left:0px;position:absolute;filter: Alpha(opacity=50);opacity:0.5; background:#000000; display:none;}*/
+    /*  {% else %}*/
     #popbox{position:absolute;width:600px; height:400px; left:45%; top:50%; margin:-200px 0 0 -200px; display:block; background:#ffffff;}
     #supbox{position:absolute;width:400px; height:200px; left:50%; top:50%; margin:-200px 0 0 -200px; display:none; background:#ffffff;}
     #bg{width:100%;height:100%;top:0px;left:0px;position:absolute;filter: Alpha(opacity=50);opacity:0.5; background:#000000; display:block;}
-      {% endif %}
+      /*{% endif %}*/
       </style>
 
 
@@ -92,7 +92,7 @@
 <div class="container">
   <main>
     <div class="py-5 text-center">
-        <p style="color:#FF0000";>This page is for public usage only. If you are an expert, please go to the <a href="https://chren.cs.unc.edu/expert">Expert Page</a>. </p> <br><br>
+        <p style="color:#FF0000";>This page is for public usage only. If you are an expert, please go to the <a href="/expert">Expert Page</a>. </p> <br><br>
       <img src="/static/icon.png" width="120" height="140" class="d-inline-block align-top" alt="">
     </div>
     <div class="text-center">
@@ -102,11 +102,6 @@
      <div class="py-5 input-group">
        <span class="input-group-text" style="width: 90px">Model</span>
        <select class="form-select" required id="model" name="model">
-<!--           {% if nmt %}-->
-<!--             <option selected value="nmt">Neural Machine Translation</option>-->
-<!--           {% else %}-->
-<!--             <option selected value="smt">Statistical Machine Translation</option>-->
-<!--           {% endif %}-->
          <option selected value="nmt">Neural Machine Translation</option>
          <option value="smt">Statistical Machine Translation</option>
        </select>
@@ -124,7 +119,7 @@
         <div class="input-group" id="chr_box">
            <span class="input-group-text" style="width: 90px">Cherokee</span>
            <textarea class="form-control" aria-label="With textarea" rows="3" name="chr" id="chr"
-                     placeholder="Input any Cherokee text or choose an example input from above" required>{{chr}}</textarea>
+                     placeholder="Input any Cherokee text or choose an example input from above" required></textarea>
         </div>
         <div id="chr_qe_feedback" style="display: none">
           <i style="font-size: 14px; margin-left: 90px;">Translation Quality Estimation:</i>
@@ -182,7 +177,7 @@
         <div class="input-group" id="en_box">
           <span class="input-group-text" style="width: 90px">English </span>
           <textarea class="form-control" aria-label="With textarea" rows="3" name="en" id="en"
-                    placeholder="Input any English text or choose an example input from above" required>{{en}}</textarea>
+                    placeholder="Input any English text or choose an example input from above" required></textarea>
         </div>
      <div id="en_qe_feedback" style="display: none">
       <i style="font-size: 14px; margin-left: 90px;">Translation Quality Estimation:</i>
@@ -293,13 +288,11 @@
         document.getElementById("bg").style.display="none";
         document.getElementById("supbox").style.display="none" ;
     }
-    // var translate_form = document.getElementById("translate");
     var en_box = document.getElementById("en_box");
     var en = document.getElementById("en");
     var chr_box = document.getElementById("chr_box");
     var chr = document.getElementById("chr");
     function submitToEn (button) {
-        console.log("toen");
         if (chr.value === "") {
             chr_box.classList.add('was-validated');
             return false;
@@ -317,13 +310,21 @@
             document.getElementById("en_qe_feedback").style.setProperty("display", "block");
             document.getElementById("collapseThree0").setAttribute("class", "collapse");
             document.getElementById('en_example').value= "";
+            var i = 0;
+            var radios = document.getElementsByName("rate_en");
+            while (i < radios.length) {
+                radios[i].checked = false;
+                i++;
+            }
+            document.getElementById('feedback_en_open_text').value= "";
+            console.log( document.getElementById('feedback_en_open_text').value);
             document.getElementById("align").style.setProperty("display", "block");
             document.getElementById("container").style.setProperty("width", data.width + "px");
             document.getElementById("container").style.setProperty("height", data.height + "px");
+            document.getElementById("container").innerHTML = "";
             drawAlign(data.word_alignment);
             document.getElementById("dictionary").style.setProperty("display", "block");
             document.getElementById("dictionary_table").style.setProperty("height", data.table_height + "px");
-            console.log(data.table);
             document.getElementById("dictionary_table").innerHTML = data.table;
         })
     }
@@ -345,13 +346,20 @@
             document.getElementById("en_qe_feedback").style.setProperty("display", "none");
             document.getElementById("collapseThree1").setAttribute("class", "collapse");
             document.getElementById('chr_example').value= "";
+            var i = 0;
+            var radios = document.getElementsByName("rate_chr");
+            while (i < radios.length) {
+                radios[i].checked = false;
+                i++;
+            }
+            document.getElementById('feedback_chr_open_text').value= "";
             document.getElementById("align").style.setProperty("display", "block");
             document.getElementById("container").style.setProperty("width", data.width + "px");
             document.getElementById("container").style.setProperty("height", data.height + "px");
+            document.getElementById("container").innerHTML = "";
             drawAlign(data.word_alignment);
             document.getElementById("dictionary").style.setProperty("display", "block");
             document.getElementById("dictionary_table").style.setProperty("height", data.table_height + "px");
-            console.log(data.table);
             document.getElementById("dictionary_table").innerHTML = data.table;
         })
     }
@@ -393,18 +401,14 @@
       }
 
     function exampleChr() {
-        console.log(document.getElementById("chr_example").value);
         var chr_e = document.getElementById("chr_example");
         document.getElementById("chr").value = chr_e.options[chr_e.selectedIndex].text;
     }
     function exampleEn() {
-        console.log(document.getElementById("en_example").value);
         var en_e = document.getElementById("en_example");
         document.getElementById("en").value = en_e.options[en_e.selectedIndex].text;
     }
 
-    // var feedback_chr = document.getElementById("feedback_chr");
-    // $(document).on('submit','#feedback_chr',function(e) {
     function feedbackChr() {
       var radios = document.getElementsByName("rate_chr");
       var radios_box = document.getElementById("rate_chr");
