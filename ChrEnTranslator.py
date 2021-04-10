@@ -303,8 +303,58 @@ def look_up_dictionary(en_tokens, chr_tokens):
             break
     table_height = 120 * len(terms) + 50
     terms = ' '.join(terms)
-    table = f'<tbody>{terms}</tbody>'
+    table = f'<table class="table table-striped"> <thead><tr><th scope="col" style="width: 300px">' \
+            f'Cherokee Syllabary/Phonetic</th><th scope="col" style="width: 200px">English</th> ' \
+            f'<th scope="col">Sentence</th></tr></thead><tbody>{terms}</tbody></table>'
     return table, table_height
+
+
+@app.route('/toen', methods=['POST'])
+def toen():
+    en, en_qe = "", 0.0
+    word_alignment, width, height = [], 0, 0
+    table, table_height = "", 0
+    if request.method == "POST":
+        chr = request.form.get("chr")
+        model = request.form.get("model")
+        if model == "nmt":
+            if chr.strip() != '':
+                en, en_qe, word_alignment, width, height, table, table_height = chren_translate(chr)
+                align, dictionary = True, True if table_height > 0 else False
+        elif model == "smt":
+            if chr.strip() != '':
+                en, en_qe, word_alignment, width, height, table, table_height = smt_chren_translate(chr)
+                align, dictionary = True, True if table_height > 0 else False
+    if width > 0:
+        width = min(width, 450) + 100
+        height = min(height, 450) + 150
+    if table_height > 0:
+        table_height = min(table_height, 400)
+    return {"en": en, "en_qe": en_qe, "word_alignment": word_alignment, "width": width, "height": height,
+            "table": table, "table_height": table_height}
+
+
+@app.route('/tochr', methods=['POST'])
+def tochr():
+    chr, chr_qe = "", 0.0
+    word_alignment, width, height = [], 0, 0
+    table, table_height = "", 0
+    if request.method == "POST":
+        en = request.form.get("en")
+        model = request.form.get("model")
+        if model == "nmt":
+            if en.strip() != '':
+                chr, chr_qe, word_alignment, width, height, table, table_height = enchr_translate(en)
+        elif model == "smt":
+            if en.strip() != '':
+                chr, chr_qe, word_alignment, width, height, table, table_height = smt_enchr_translate(en)
+    if width > 0:
+        width = min(width, 450) + 100
+        height = min(height, 450) + 150
+    if table_height > 0:
+        table_height = min(table_height, 400)
+    return {"chr": chr, "chr_qe": chr_qe, "word_alignment": word_alignment, "width": width, "height": height,
+            "table": table, "table_height": table_height}
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -324,40 +374,6 @@ def index():
     en_qe, chr_qe = 0.0, 0.0
     align, word_alignment, width, height = False, [], 0, 0
     dictionary, table, table_height = False, "", 0
-    if request.method == "POST":
-        if request.form["model"] == "nmt":
-            nmt = True
-            if request.form["action"] == "tochr":
-                tochr, toen = True, False
-                en = request.form["en"]
-                if en.strip() != '':
-                    chr, chr_qe, word_alignment, width, height, table, table_height = enchr_translate(en)
-                    align, dictionary = True, True if table_height > 0 else False
-            elif request.form["action"] == "toen":
-                toen, tochr = True, False
-                chr = request.form["chr"]
-                if chr.strip() != '':
-                    en, en_qe, word_alignment, width, height, table, table_height = chren_translate(chr)
-                    align, dictionary = True, True if table_height > 0 else False
-        elif request.form["model"] == "smt":
-            nmt = False
-            if request.form["action"] == "tochr":
-                tochr, toen = True, False
-                en = request.form["en"]
-                if en.strip() != '':
-                    chr, chr_qe, word_alignment, width, height, table, table_height = smt_enchr_translate(en)
-                    align, dictionary = True, True if table_height > 0 else False
-            elif request.form["action"] == "toen":
-                toen, tochr = True, False
-                chr = request.form["chr"]
-                if chr.strip() != '':
-                    en, en_qe, word_alignment, width, height, table, table_height = smt_chren_translate(chr)
-                    align, dictionary = True, True if table_height > 0 else False
-    if width > 0:
-        width = min(width, 450) + 100
-        height = min(height, 450) + 150
-    if table_height > 0:
-        table_height = min(table_height, 400)
     return render_template('index.html', en=en, chr=chr, tochr=tochr, toen=toen,
                            nmt=nmt, en_qe=en_qe, chr_qe=chr_qe,
                            align=align, word_alignment=word_alignment, width=width, height=height,
