@@ -316,6 +316,7 @@
             document.getElementById("chr_qe_feedback").style.setProperty("display", "none");
             document.getElementById("en_qe_feedback").style.setProperty("display", "block");
             document.getElementById("collapseThree0").setAttribute("class", "collapse");
+            document.getElementById('en_example').value= "";
             document.getElementById("align").style.setProperty("display", "block");
             document.getElementById("container").style.setProperty("width", data.width + "px");
             document.getElementById("container").style.setProperty("height", data.height + "px");
@@ -343,6 +344,7 @@
             document.getElementById("chr_qe_feedback").style.setProperty("display", "block");
             document.getElementById("en_qe_feedback").style.setProperty("display", "none");
             document.getElementById("collapseThree1").setAttribute("class", "collapse");
+            document.getElementById('chr_example').value= "";
             document.getElementById("align").style.setProperty("display", "block");
             document.getElementById("container").style.setProperty("width", data.width + "px");
             document.getElementById("container").style.setProperty("height", data.height + "px");
@@ -416,7 +418,6 @@
           radios_box.classList.add('was-validated');
           return false;
       }
-      // console.log("here");
       $.ajax({
         type:'POST',
         url:'/feedback',
@@ -427,7 +428,7 @@
           en: document.querySelector('textarea[name="en"]').value,
           model: document.querySelector('select[name="model"]').value,
           comment: document.querySelector('textarea[name="feedback_chr_open"]').value,
-          qe: {{chr_qe | safe}},
+          qe: document.getElementById("chr_qe").style.getPropertyValue("--rating"),
         },
         success:function()
         {
@@ -464,7 +465,7 @@
           en: document.querySelector('textarea[name="en"]').value,
           model: document.querySelector('select[name="model"]').value,
           comment: document.querySelector('textarea[name="feedback_en_open"]').value,
-          qe: {{en_qe | safe}},
+          qe: document.getElementById("en_qe").style.getPropertyValue("--rating"),
         },
         success:function()
         {

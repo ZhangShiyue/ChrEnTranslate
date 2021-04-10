@@ -457,7 +457,7 @@ def feedback():
         mongo.db.user.insert_one({"type": type, "model": model, "en": en, "chr": chr, "qe": qe,
                                   "rate": rate, "timestamp": time.time(),
                                   "comment": comment})
-    return render_template('index.html')
+    return {}
 
 
 if __name__ == '__main__':
