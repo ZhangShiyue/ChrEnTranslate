@@ -69,7 +69,7 @@ Here is a screen shot:
 ![Demo](static/demo.png)
 
 
-#### Disclaimer
+### Disclaimer
 * Whenever you use our demo, you agree to be aware that the translations provided by our demo are translated by machines, 
 are highly likely to be poor-quality, and are not supposed to be used anywhere else without confirmation from professional 
 Cherokee-English translators.
