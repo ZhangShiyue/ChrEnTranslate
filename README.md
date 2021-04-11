@@ -7,18 +7,17 @@ However, to avoid misusing, we have not opened it to the public yet.
 If you are an Cherokee-English expert and want to participate in our human-in-the-loop development,
 do not hesitate to contact us (Shiyue Zhang, shiyue At cs.unc.edu).
 
-### Data
-The data used to train our translation models is provided [here](https://github.com/ZhangShiyue/ChrEn/tree/main/data/demo/04112021).
+### Local Setup
 
-
-### Models
+#### Models
 Download NMT translation models, 
 vocabulary files,
 SMT translation models, 
 and QE models from [here](https://drive.google.com/drive/folders/1XjYPp3YV-GL2WXGrFIVSXNxidY3yKv2y?usp=sharing).
 Decompress all of them and put them under this code directory, e.g., ./ChrEnTranslate/models.
 
-### Installation
+Note that, the data used to train our translation models is provided [here](https://github.com/ZhangShiyue/ChrEn/tree/main/data/demo/04112021).
+This data is not necessary for setting up this demo.
 
 #### Python Environment
 ```
