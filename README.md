@@ -1,4 +1,4 @@
-##Cherokee-English Translate Demo
+## Cherokee-English Translate Demo
 
 ### Online Website
 Our demo is at https://chren.cs.unc.edu/. 
@@ -59,14 +59,14 @@ See ChrEnTranslator.py for how we use MongoDB.
 
 
 #### Start
-After the preparation above, simply start the demo by
+After the preparation above, simply start the demo by running:
 ```
 python ChrEnTranslator.py 
 ```
 Then you can access to the website via http://127.0.0.1:5000/ or http://127.0.0.1:5000/expert.
 
 Here is a screen shot:
-![Demo](demo.png)
+![Demo](static/demo.png)
 
 
 #### Disclaimer
