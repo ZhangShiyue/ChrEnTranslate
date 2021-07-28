@@ -68,7 +68,7 @@ Here is a screen shot:
 ![Demo](static/demo.png)
 
 If you want to run it as a online service. 
-Please refer to [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uswgi-and-nginx-on-ubuntu-18-04#step-6-%E2%80%94-configuring-nginx-to-proxy-requests).
+Please refer to [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uswgi-and-nginx-on-ubuntu-18-04).
 
 ### Disclaimer
 * Whenever you use our demo, you agree to be aware that the translations provided by our demo are translated by machines, 
