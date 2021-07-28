@@ -72,15 +72,15 @@ def _parse_opt(opt):
     return opt
 
 
-enchr_opt = {'models': ["models/data_demo_feedback_round2_ced_enchr_min0_brnn_adam_0.0005_1000_2_0.5_1024_LSTM_0.2_seed7/model_step_0_release.pt",
-                        "models/data_demo_feedback_round2_ced_enchr_min0_brnn_adam_0.0005_1000_2_0.5_1024_LSTM_0.2_seed77/model_step_0_release.pt",
-                        "models/data_demo_feedback_round2_ced_enchr_min0_brnn_adam_0.0005_1000_2_0.5_1024_LSTM_0.2_seed777/model_step_0_release.pt"]}
+enchr_opt = {'models': ["models/data_demo_feedback_enchr_min0_brnn_adam_0.0005_1000_2_0.5_1024_LSTM_0.2_seed7/model_step_0_release.pt",
+                        "models/data_demo_feedback_enchr_min0_brnn_adam_0.0005_1000_2_0.5_1024_LSTM_0.2_seed77/model_step_0_release.pt",
+                        "models/data_demo_feedback_enchr_min0_brnn_adam_0.0005_1000_2_0.5_1024_LSTM_0.2_seed777/model_step_0_release.pt"]}
 enchr_opt = _parse_opt(enchr_opt)
 enchr_translator = build_translator(enchr_opt, report_score=False)
 
-chren_opt = {'models': ["models/data_demo_feedback_round2_ced_chren_bpe35000-35000_min10_brnn_adam_0.0005_1000_2_0.3_1024_LSTM_0.2_7/model_step_0_release.pt",
-                        "models/data_demo_feedback_round2_ced_chren_bpe35000-35000_min10_brnn_adam_0.0005_1000_2_0.3_1024_LSTM_0.2_77/model_step_0_release.pt",
-                        "models/data_demo_feedback_round2_ced_chren_bpe35000-35000_min10_brnn_adam_0.0005_1000_2_0.3_1024_LSTM_0.2_777/model_step_0_release.pt"]}
+chren_opt = {'models': ["models/data_demo_feedback_chren_bpe35000-35000_min10_brnn_adam_0.0005_1000_2_0.3_1024_LSTM_0.2_7/model_step_0_release.pt",
+                        "models/data_demo_feedback_chren_bpe35000-35000_min10_brnn_adam_0.0005_1000_2_0.3_1024_LSTM_0.2_77/model_step_0_release.pt",
+                        "models/data_demo_feedback_chren_bpe35000-35000_min10_brnn_adam_0.0005_1000_2_0.3_1024_LSTM_0.2_777/model_step_0_release.pt"]}
 chren_opt = _parse_opt(chren_opt)
 chren_translator = build_translator(chren_opt, report_score=False)
 
@@ -361,12 +361,12 @@ def tochr():
 def index():
     # get examples
     chrs, chrs_id = [], []
-    cursors = mongo.db.chr.find({"status": "unlabeled"}).limit(5)
+    cursors = mongo.db.chr_example.find().limit(5)
     for cursor in cursors:
         chrs.append(cursor["text"])
         chrs_id.append(cursor["uid"])
     ens, ens_id = [], []
-    cursors = mongo.db.en.find({"status": "unlabeled"}).limit(5)
+    cursors = mongo.db.en_example.find().limit(5)
     for cursor in cursors:
         ens.append(cursor["text"])
         ens_id.append(cursor["uid"])
@@ -449,4 +449,4 @@ def feedback():
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
